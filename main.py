@@ -4,14 +4,14 @@ from shape import GeometryTool
 
 class WelcomePage(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent, bg="#3498db")  # Set background color
         self.controller = controller
 
-        self.welcome_label = tk.Label(self, text="Welcome to GeoMaths!\nA tool to help with geometry concepts while also improving programming skills.")
-        self.welcome_label.pack(pady=10)
+        self.welcome_label = tk.Label(self, text="Welcome to GeoMaths!\nA tool to help with geometry concepts while also learning some programming skills.", font=("Arial", 12), bg="#3498db", fg="white")
+        self.welcome_label.pack(pady=20)
 
-        self.learn_button = tk.Button(self, text="Learn about 2D Shapes", command=self.show_shapes)
-        self.learn_button.pack(pady=5)
+        self.learn_button = tk.Button(self, text="Learn about 2D Shapes", command=self.show_shapes, bg="#2ecc71", fg="grey", font=("Arial", 10))
+        self.learn_button.pack(pady=10)
 
     def show_shapes(self):
         self.controller.show_frame(GeometryTool)
@@ -21,6 +21,8 @@ class MainApp(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         tk.Tk.wm_title(self, "Turtle Graphics Tool")
+
+        self.configure(bg="#ecf0f1") 
 
         self.notebook = ttk.Notebook(self)
 
