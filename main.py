@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 from shape import GeometryTool
+from angle import AngleTool
 
 class WelcomePage(tk.Frame):
     def __init__(self, parent, controller):
@@ -10,11 +11,17 @@ class WelcomePage(tk.Frame):
         self.welcome_label = tk.Label(self, text="Welcome to GeoMaths!\nA tool to help with geometry concepts while also learning some programming skills.", font=("Arial", 12), bg="#3498db", fg="white")
         self.welcome_label.pack(pady=20)
 
-        self.learn_button = tk.Button(self, text="Learn about 2D Shapes", command=self.show_shapes, bg="#2ecc71", fg="grey", font=("Arial", 10))
-        self.learn_button.pack(pady=10)
+        self.learn_shapes_button = tk.Button(self, text="Learn about 2D Shapes", command=self.show_shapes, bg="#2ecc71", fg="grey", font=("Arial", 10))
+        self.learn_shapes_button.pack(pady=10)
+
+        self.learn_angles_button = tk.Button(self, text="Learn about Angles", command=self.show_angles, bg="#2ecc71", fg="grey", font=("Arial", 10))
+        self.learn_angles_button.pack(pady=10)
 
     def show_shapes(self):
         self.controller.show_frame(GeometryTool)
+
+    def show_angles(self):
+        self.controller.show_frame(AngleTool)
 
 
 class MainApp(tk.Tk):
@@ -28,14 +35,15 @@ class MainApp(tk.Tk):
 
         self.welcome_page = WelcomePage(self.notebook, self)
         self.shapes_page = GeometryTool(self.notebook)
+        self.angles_page = AngleTool(self.notebook)
 
         self.notebook.add(self.welcome_page, text="Welcome")
         self.notebook.add(self.shapes_page, text="2D Shapes")
+        self.notebook.add(self.angles_page, text="Angles and Triangles")
 
         self.notebook.pack(expand=1, fill="both")
 
     def show_frame(self, frame_class):
-        """Show a frame for the given class"""
         for index, child in enumerate(self.notebook.winfo_children()):
             if isinstance(child, frame_class):
                 self.notebook.select(index)
