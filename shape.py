@@ -2,70 +2,49 @@ import tkinter as tk
 from tkinter import scrolledtext
 from tkinter import messagebox
 import math
+import turtle 
 
 class Turtle:
-    def __init__(self, canvas):
+    def __init__(self, canvas, output_display):
         self.canvas = canvas
-        self.turtle_id = self.canvas.create_line(250, 250, 250, 250, width=2, fill="black")
-        self.pen_down = True
-        self.angle = 0  # Initial angle
+        self.output_display = output_display
+        self.turtle = turtle.RawTurtle(canvas)
+        self.turtle.speed(1)
 
     def execute_code(self, code):
         lines = code.split('\n')
         for line in lines:
-            self.execute_line(line.strip())
-
+            result = self.execute_line(line.strip())
+            if result and "Invalid command" in result:
+                return result
         return "Code executed successfully."
 
     def execute_line(self, line):
         tokens = line.split()
 
         if not tokens:
-            print("Invalid command: Empty line")
-            return
-        
-        if tokens[0] == "move_forward" and len(tokens) == 2:
+            return None  # Ignore empty lines
+
+        if tokens[0] == "forward" and len(tokens) == 2:
             try:
                 distance = float(tokens[1])
                 self.move_forward(distance)
             except ValueError:
-                print(f"Invalid command: {line}")
-        elif tokens[0] == "turn_right" and len(tokens) == 2:
+                return f"Invalid command: {line}"
+        elif tokens[0] == "right" and len(tokens) == 2:
             try:
                 angle = float(tokens[1])
                 self.turn_right(angle)
             except ValueError:
-                print(f"Invalid command: {line}")
+                return f"Invalid command: {line}"
         else:
-            print(f"Invalid command: {line}")
-            self.canvas.create_text(
-                10, 10, anchor=tk.NW,
-                text=f"Error: Invalid command - {line}", font=("Arial", 12), fill="red"
-            )
-
-
-    def draw_line(self, distance):
-        angle_radians = self.angle * (3.141592653589793 / 180.0)
-        new_x = self.canvas.coords(self.turtle_id)[2] + distance * math.cos(angle_radians)
-        new_y = self.canvas.coords(self.turtle_id)[3] + distance * math.sin(angle_radians)
-
-        if self.pen_down:
-            self.canvas.create_line(
-                self.canvas.coords(self.turtle_id)[2],
-                self.canvas.coords(self.turtle_id)[3],
-                new_x,
-                new_y,
-                width=2,
-                fill="black"
-            )
-
-        self.canvas.coords(self.turtle_id, new_x - 1, new_y - 1, new_x + 1, new_y + 1)
+            return f"Invalid command: {line}"
 
     def move_forward(self, distance):
-        self.draw_line(distance)
+        self.turtle.forward(distance)
 
     def turn_right(self, angle):
-        self.angle -= angle
+        self.turtle.right(angle)
 
 
 class GeometryTool(tk.Frame):
@@ -136,23 +115,36 @@ class GeometryTool(tk.Frame):
         self.turtle_canvas = tk.Canvas(self, width=500, height=500, bg="white")
         self.turtle_canvas.grid(row=1, column=3, rowspan=7, pady=10, padx=10, sticky=tk.W)
 
-        self.turtle = Turtle(self.turtle_canvas)
+        self.turtle = Turtle(self.turtle_canvas, self.output_display)
+
+        self.output_display.tag_config("error", foreground="red")
+        self.output_display.tag_config("success", foreground="green")
+
+
 
     def draw_square(self):
-        instructions = "move_forward 50\nturn_right 90\nmove_forward 50\nturn_right 90\nmove_forward 50\nturn_right 90\nmove_forward 50"
+        instructions = "forward 50\nright 90\nforward 50\nright 90\nforward 50\nright 90\nforward 50"
         self.instructions.set(instructions)
+        self.code_editor.delete("1.0", tk.END)
+        self.code_editor.insert(tk.END, instructions)
 
     def draw_circle(self):
-        instructions = "repeat 360 [move_forward 1\nturn_right 1]"
+        instructions = "repeat 360 [forward 1\nright 1]"
         self.instructions.set(instructions)
+        self.code_editor.delete("1.0", tk.END)
+        self.code_editor.insert(tk.END, instructions)
 
     def draw_rectangle(self):
-        instructions = "move_forward 100\nturn_right 90\nmove_forward 50\nturn_right 90\nmove_forward 100\nturn_right 90\nmove_forward 50"
+        instructions = "forward 100\nright 90\nforward 50\nright 90\nforward 100\nright 90\nforward 50"
         self.instructions.set(instructions)
+        self.code_editor.delete("1.0", tk.END)
+        self.code_editor.insert(tk.END, instructions)
 
     def draw_triangle(self):
-        instructions = "move_forward 100\nturn_right 120\nmove_forward 100\nturn_right 120\nmove_forward 100"
+        instructions = "forward 100\nright 120\nforward 100\nright 120\nforward 100"
         self.instructions.set(instructions)
+        self.code_editor.delete("1.0", tk.END)
+        self.code_editor.insert(tk.END, instructions)
 
     def draw_custom(self):
         instructions = "# Try drawing your own shapes!\n# Use commands like move_forward, turn_right, etc.\n# Example: move_forward 50\nturn_right 90\nmove_forward 50"
@@ -162,8 +154,17 @@ class GeometryTool(tk.Frame):
         code = self.code_editor.get("1.0", tk.END)
         self.output_display.config(state=tk.NORMAL)
         self.output_display.delete("1.0", tk.END)
+
         result = self.turtle.execute_code(code)
-        self.output_display.insert(tk.END, result)
+
+        if "Invalid command" in result:
+            # Display the error message in red
+            self.output_display.insert(tk.END, result, "error")
+        else:
+            # Display the success message in green
+            self.output_display.insert(tk.END, "Code executed successfully.", "success")
+
+
         self.output_display.config(state=tk.DISABLED)
 
     def execute_instructions(self):
@@ -179,7 +180,7 @@ class GeometryTool(tk.Frame):
         self.code_editor.delete("1.0", tk.END)
 
     def copy_instructions(self):
-        instructions_text = self.instructions.get()
+        instructions_text = self.instructions.get().strip()
         if instructions_text:
             self.clipboard_clear()
             self.clipboard_append(instructions_text)
@@ -187,10 +188,17 @@ class GeometryTool(tk.Frame):
         else:
             messagebox.showwarning("Copy Instructions", "No instructions to copy.")
 
+    def clear_turtle_canvas(self):
+        self.turtle_canvas.delete("all")
 
     def clear_drawing(self):
         print("Clear Drawing method called.")
-        self.turtle_canvas.delete("all")
+        self.turtle.turtle.clear()
+        self.turtle.turtle.penup()  # Lift the pen to move without drawing
+        self.turtle.turtle.goto(0, 0)  # Move back to the original position
+        self.turtle.turtle.pendown()  # Put the pen down to start drawing again
+
+
 
     def on_page_enter(self, event):
         if not self.welcome_message_shown:
