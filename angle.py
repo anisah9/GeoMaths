@@ -2,7 +2,6 @@ import tkinter as tk
 from turtle import RawTurtle, Canvas
 from tkinter import messagebox
 
-
 class AngleTool(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master, bg="#ecf0f1")
@@ -71,9 +70,6 @@ class AngleTool(tk.Frame):
         self.turtle.write("360 degrees", align="center", font=("Arial", 12, "normal"))
 
         messagebox.showinfo("Meet at a Point", "The angles meet at a point. The sum of angles around a point is 360 degrees.")
-
-
-
 
     def on_a_straight_line(self):
         # Draw a triangle with red points at the vertices where angles add up to 180 degrees
