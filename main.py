@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 from shape import GeometryTool
 from angle import AngleTool
+from coordinate import CoordinateTool
 
 class WelcomePage(tk.Frame):
     def __init__(self, parent, controller):
@@ -17,11 +18,17 @@ class WelcomePage(tk.Frame):
         self.learn_angles_button = tk.Button(self, text="Learn about Angles", command=self.show_angles, bg="#2ecc71", fg="grey", font=("Arial", 10))
         self.learn_angles_button.pack(pady=10)
 
+        self.learn_coordinates_button = tk.Button(self, text="Learn about Coordinates", command=self.show_coordinates, bg="#2ecc71", fg="grey", font=("Arial", 10))
+        self.learn_coordinates_button.pack(pady=10)
+
     def show_shapes(self):
         self.controller.show_frame(GeometryTool)
 
     def show_angles(self):
         self.controller.show_frame(AngleTool)
+
+    def show_coordinates(self):
+        self.controller.show_frame(CoordinateTool)
 
 
 class MainApp(tk.Tk):
@@ -36,10 +43,12 @@ class MainApp(tk.Tk):
         self.welcome_page = WelcomePage(self.notebook, self)
         self.shapes_page = GeometryTool(self.notebook)
         self.angles_page = AngleTool(self.notebook)
+        self.coordinates_page = CoordinateTool(self.notebook)
 
         self.notebook.add(self.welcome_page, text="Welcome")
         self.notebook.add(self.shapes_page, text="2D Shapes")
         self.notebook.add(self.angles_page, text="Angles and Triangles")
+        self.notebook.add(self.coordinates_page, text="Coordinate Systems")
 
         self.notebook.pack(expand=1, fill="both")
 
