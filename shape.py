@@ -3,6 +3,13 @@ from tkinter import scrolledtext
 from tkinter import messagebox
 import math
 import turtle 
+import io
+
+from tkinter import filedialog
+from tkinter import messagebox
+from PIL import Image
+
+
 
 class Turtle:
     def __init__(self, canvas, output_display):
@@ -54,7 +61,14 @@ class GeometryTool(tk.Frame):
 
         self.welcome_message_shown = False
         self.bind("<Enter>", self.on_page_enter)
-    
+
+        # Add buttons for saving and exporting drawings
+        self.save_drawing_button = tk.Button(self, text="Save Drawing", command=self.save_drawing)
+        self.save_drawing_button.grid(row=8, column=1, pady=5, padx=10, sticky=tk.W)
+
+        self.export_drawing_button = tk.Button(self, text="Export Drawing", command=self.export_drawing)
+        self.export_drawing_button.grid(row=8, column=2, pady=5, padx=10, sticky=tk.W)
+
         
 
         # Add a set of instructions
@@ -70,10 +84,6 @@ class GeometryTool(tk.Frame):
 
         self.instructions_entry = tk.Entry(self, textvariable=self.instructions, width=50)
         self.instructions_entry.grid(row=0, column=1, pady=5, padx=10, sticky=tk.W, ipady=10)  # Adjust ipady as needed
-
-        # # Add a button to execute the instructions
-        # self.execute_instructions_button = tk.Button(self, text="Execute Instructions", command=self.execute_instructions)
-        # self.execute_instructions_button.grid(row=0, column=2, pady=5, padx=10, sticky=tk.W)
 
         # Add a button to copy instructions to clipboard
         self.copy_instructions_button = tk.Button(self, text="Copy Instructions", command=self.copy_instructions)
@@ -211,6 +221,50 @@ class GeometryTool(tk.Frame):
             "Click on the shape buttons to see how to draw some shapes, copy the text and then click 'Run Code' to see the result!\n\nPress the Draw Custom shape to draw a custom shape! "
         )
         messagebox.showinfo("Learn 2D Shapes", welcome_message)
+
+    def save_drawing(self):
+        file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg;*.jpeg")])
+
+        if file_path:
+            try:
+                # Capture the drawing on the canvas as an image
+                image = self.capture_drawing()
+
+                # Save the image to the specified file path
+                image.save(file_path)
+
+                messagebox.showinfo("Save Drawing", f"Drawing saved successfully at {file_path}")
+            except Exception as e:
+                messagebox.showerror("Error", f"An error occurred while saving the drawing: {str(e)}")
+
+    def export_drawing(self):
+        file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg;*.jpeg")])
+
+        if file_path:
+            try:
+                # Capture the drawing on the canvas as an image
+                image = self.capture_drawing()
+
+                # Save the image to the specified file path
+                image.save(file_path)
+
+                messagebox.showinfo("Export Drawing", f"Drawing exported successfully at {file_path}")
+            except Exception as e:
+                messagebox.showerror("Error", f"An error occurred while exporting the drawing: {str(e)}")
+
+
+    def capture_drawing(self):
+        try:
+            # Capture the drawing on the canvas as an image
+            drawing_data = self.turtle_canvas.postscript(colormode='color')
+            image = Image.open(io.BytesIO(drawing_data.encode('utf-8')))
+            return image
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred while saving the drawing: {str(e)}")
+
+        return None
+
+
 
 
 if __name__ == "__main__":
