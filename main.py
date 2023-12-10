@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, scrolledtext
+from tkinter import ttk
 from shape import GeometryTool
 from angle import AngleTool
 from coordinate import CoordinateTool
