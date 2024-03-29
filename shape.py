@@ -3,13 +3,23 @@ from tkinter import scrolledtext
 from tkinter import messagebox
 import turtle 
 import io
+import Pmw
 
 from tkinter import filedialog
 from tkinter import messagebox
 from PIL import Image
 
 
-
+# List of math challenges for the Geometry Tool
+math_challenges = [
+        {"description": "Draw a square with each side measuring 100 pixels.",
+        "hints": ["Use the forward and right commands", "A square has equal sides and each angle is 90 degrees."],
+        "commands": ["forward 100", "right 90", "forward 100", "right 90", "forward 100", "right 90", "forward 100"]},
+        {"description": "Draw a right-angled triangle with sides 50, 120, 130 pixels.",
+        "hints": ["Use the Pythagorean theorem to verify the sides.", "The sum of angles in a triangle is 180 degrees."],
+        "commands": ["forward 50", "right 90", "forward 120", "right 135", "forward 130"]}
+    
+]
 class Turtle:
     def __init__(self, canvas, output_display):
         self.canvas = canvas
@@ -58,6 +68,9 @@ class GeometryTool(tk.Frame):
         tk.Frame.__init__(self, master, bg="#ecf0f1")
         self.winfo_toplevel().title("Geometry Tool")
 
+
+        
+
         self.welcome_message_shown = False
         self.bind("<Enter>", self.on_page_enter)
 
@@ -65,14 +78,12 @@ class GeometryTool(tk.Frame):
         self.save_drawing_button = tk.Button(self, text="Save Drawing", command=self.save_drawing)
         self.save_drawing_button.grid(row=8, column=1, pady=5, padx=10, sticky=tk.W)
 
+        # Balloon tooltips setup
+        self.balloon = Pmw.Balloon(self)
+        self.balloon.bind(self.save_drawing_button, 'Save the current drawing to a file.')
+
         self.export_drawing_button = tk.Button(self, text="Export Drawing", command=self.export_drawing)
         self.export_drawing_button.grid(row=8, column=2, pady=5, padx=10, sticky=tk.W)
-
-        
-
-        # Add a set of instructions
-        self.instructions_label = tk.Label(self, text="Instructions:", font=("Arial", 13), bg="#ecf0f1")
-        self.instructions_label.grid(row=0, column=0, pady=10, sticky=tk.W)
 
         self.instructions = tk.StringVar()
         self.instructions.set("")
@@ -80,13 +91,6 @@ class GeometryTool(tk.Frame):
        # Add a label next to the text editor
         editor_info_label = tk.Label(self, text="Enter your drawing instructions below:", font=("Arial", 13), bg="#ecf0f1")
         editor_info_label.grid(row=1, column=1, pady=10, padx=10, sticky=tk.W)
-
-        self.instructions_entry = tk.Entry(self, textvariable=self.instructions, width=50)
-        self.instructions_entry.grid(row=0, column=1, pady=5, padx=10, sticky=tk.W, ipady=10)  # Adjust ipady as needed
-
-        # Add a button to copy instructions to clipboard
-        self.copy_instructions_button = tk.Button(self, text="Copy Instructions", command=self.copy_instructions)
-        self.copy_instructions_button.grid(row=0, column=3, pady=5, padx=10, sticky=tk.W)
 
         # Add a button to clear the instructions
         self.clear_button = tk.Button(self, text="Clear Instructions", command=self.clear_instructions)
@@ -129,6 +133,98 @@ class GeometryTool(tk.Frame):
         self.output_display.tag_config("error", foreground="red")
         self.output_display.tag_config("success", foreground="green")
 
+        self.turtle_canvas.bind("<Button-1>", self.on_canvas_click) 
+
+        # Initialize mode
+        self.drawing_mode = True
+
+
+        self.turtle_canvas.bind("<B1-Motion>", self.on_canvas_move)
+
+        # Attributes for math challenges
+        self.current_challenge_index = 0
+        self.challenge_label = tk.Label(self, text="", font=("Arial", 12), wraplength=400, bg="#ecf0f1")
+        self.challenge_label.grid(row=9, column=1, columnspan=3, sticky="w", pady=5, padx=10)
+        self.hint_label = tk.Label(self, text="", font=("Arial", 10), wraplength=400, bg="#ecf0f1", fg="blue")
+        self.hint_label.grid(row=10, column=1, columnspan=3, sticky="w", pady=5, padx=10)
+        self.next_challenge_button = tk.Button(self, text="Next Challenge", command=self.next_challenge)
+        self.next_challenge_button.grid(row=11, column=1, pady=5, padx=10, sticky="w")
+
+        self.display_current_challenge()  # Display the first challenge
+        self.current_guide_step = 0  # Tracks the current step of the guide
+        self.follow_guide = True  # User can decide to follow the guide or not
+
+        self.next_step_button = tk.Button(self, text="Next Step", command=self.next_guide_step)
+        self.next_step_button.grid(row=12, column=1, pady=5, padx=10, sticky=tk.W)
+        self.repeat_step_button = tk.Button(self, text="Repeat Step", command=self.display_guide_step)
+        self.repeat_step_button.grid(row=12, column=2, pady=5, padx=10, sticky=tk.W)
+        self.exit_guide_button = tk.Button(self, text="Exit Guide", command=self.exit_guide)
+        self.exit_guide_button.grid(row=12, column=3, pady=5, padx=10, sticky=tk.W)
+
+        # Initialize and display the first guide step
+        self.display_guide_step()
+        
+    def display_guide_step(self):
+        guide_steps = [
+            "Welcome to the Geometry Tool! Click 'Next' to start learning.",
+            "First, let's draw a square. Enter the commands in the code editor.",
+            "Great! Now let's try drawing a triangle.",
+            # Add as many steps as you need
+            "You have completed the guide!"
+        ]
+        if self.current_guide_step < len(guide_steps):
+            self.instructions.set(guide_steps[self.current_guide_step])
+        else:
+            self.instructions.set("Guide completed. Feel free to explore!")
+            self.follow_guide = False  # Guide is complete, user can explore freely
+    
+    def next_guide_step(self):
+        self.current_guide_step += 1
+        self.display_guide_step()
+
+    def exit_guide(self):
+        self.follow_guide = False
+        self.instructions.set("Guide exited. You can use the tool freely now.")
+
+
+
+
+    def display_current_challenge(self):
+        if self.current_challenge_index < len(math_challenges):
+            challenge = math_challenges[self.current_challenge_index]
+            self.challenge_label.config(text="Challenge: " + challenge["description"])
+            self.hint_label.config(text="Hints: " + "; ".join(challenge["hints"]))
+        else:
+            self.challenge_label.config(text="You have completed all challenges!")
+            self.hint_label.config(text="")
+            self.next_challenge_button.config(state="disabled")  # Disable button if no more challenges
+
+    def next_challenge(self):
+        self.current_challenge_index += 1
+        self.display_current_challenge()
+        
+    
+    def on_canvas_click(self, event):
+            # Handle drawing mode
+            x, y = event.x, event.y
+
+            # Get the code from the code editor
+            code = self.code_editor.get("1.0", tk.END)
+
+            # Execute the code and draw the shape at the mouse click position
+            self.turtle.turtle.penup()  # Lift the pen to move without drawing
+            self.turtle.turtle.goto(x - 250, 250 - y)  # Adjust coordinates to match the turtle canvas
+            self.turtle.turtle.pendown()  # Put the pen down to start drawing again
+        
+
+    def on_canvas_move(self, event):
+        if not self.drawing_mode and self.selected_shape:
+            dx = event.x - self.last_click_x
+            dy = event.y - self.last_click_y
+            self.selected_shape.move(dx, dy)  # You need to implement this method
+            self.last_click_x = event.x
+            self.last_click_y = event.y
+            self.update_canvas()  # You need to implement this method to redraw shapes
 
 
     def draw_square(self):
@@ -137,11 +233,16 @@ class GeometryTool(tk.Frame):
         self.code_editor.delete("1.0", tk.END)
         self.code_editor.insert(tk.END, instructions)
 
+
+
     def draw_circle(self):
-        instructions = "repeat 360 [forward 1\nright 1]"
-        self.instructions.set(instructions)
-        self.code_editor.delete("1.0", tk.END)
-        self.code_editor.insert(tk.END, instructions)
+        radius = 50
+        self.turtle.penup()
+        self.turtle.goto(-radius, 0)
+        self.turtle.pendown()
+        self.turtle.circle(radius)
+
+
 
     def draw_rectangle(self):
         instructions = "forward 100\nright 90\nforward 50\nright 90\nforward 100\nright 90\nforward 50"
@@ -188,15 +289,6 @@ class GeometryTool(tk.Frame):
         self.instructions.set("")
         self.code_editor.delete("1.0", tk.END)
 
-    def copy_instructions(self):
-        instructions_text = self.instructions.get().strip()
-        if instructions_text:
-            self.clipboard_clear()
-            self.clipboard_append(instructions_text)
-            messagebox.showinfo("Copy Instructions", "Instructions copied to clipboard.")
-        else:
-            messagebox.showwarning("Copy Instructions", "No instructions to copy.")
-
     def clear_turtle_canvas(self):
         self.turtle_canvas.delete("all")
 
@@ -210,9 +302,10 @@ class GeometryTool(tk.Frame):
 
 
     def on_page_enter(self, event):
-        if not self.welcome_message_shown:
-            self.show_welcome_message()
+        if not self.welcome_message_shown and self.follow_guide:
+            self.display_guide_step()  # Start the guide when the page is first entered
             self.welcome_message_shown = True
+
 
     def show_welcome_message(self):
         welcome_message = (
@@ -262,8 +355,6 @@ class GeometryTool(tk.Frame):
             messagebox.showerror("Error", f"An error occurred while saving the drawing: {str(e)}")
 
         return None
-
-
 
 
 if __name__ == "__main__":
