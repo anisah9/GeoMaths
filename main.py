@@ -1,8 +1,10 @@
 import tkinter as tk
+import Pmw
 from tkinter import ttk
 from shape import GeometryTool
 from angle import AngleTool
 from coordinate import CoordinateTool
+
 
 class WelcomePage(tk.Frame):
     def __init__(self, parent, controller):
@@ -37,6 +39,9 @@ class MainApp(tk.Tk):
         tk.Tk.wm_title(self, "Turtle Graphics Tool")
 
         self.configure(bg="#ecf0f1") 
+
+        # Initialize Pmw with the root Tk window
+        Pmw.initialise(self)
 
         self.notebook = ttk.Notebook(self)
 
