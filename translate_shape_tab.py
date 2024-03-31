@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import scrolledtext
 from tkinter import messagebox
 import turtle
+import random
 
 
 class Turtle:
@@ -88,6 +89,35 @@ class Turtle:
         self.grid_turtle.goto(0, 250)
 
         self.grid_turtle.penup()  
+    
+    def draw_random_shape(self):
+        shape = random.choice(['square', 'triangle', 'rectangle'])  
+        x = random.randint(-200, 200)
+        y = random.randint(-200, 200)
+        self.drawing_turtle.penup()
+        self.drawing_turtle.goto(x, y)
+        self.drawing_turtle.pendown()
+
+        if shape == 'square':
+            side = random.randint(20, 100)
+            for _ in range(4):
+                self.drawing_turtle.forward(side)
+                self.drawing_turtle.right(90)
+        elif shape == 'triangle':
+            side = random.randint(20, 100)
+            for _ in range(3):
+                self.drawing_turtle.forward(side)
+                self.drawing_turtle.right(120)
+        elif shape == 'rectangle':
+            length = random.randint(20, 150)  # Length of the rectangle
+            width = random.randint(20, 150)  # Width of the rectangle
+            for _ in range(2):
+                self.drawing_turtle.forward(length)
+                self.drawing_turtle.right(90)
+                self.drawing_turtle.forward(width)
+                self.drawing_turtle.right(90)
+
+
 
 
 class TranslateShapeTab(tk.Frame):
@@ -119,6 +149,10 @@ class TranslateShapeTab(tk.Frame):
         self.output_display.tag_config("error", foreground="red")
         self.output_display.tag_config("success", foreground="green")
 
+        self.draw_random_shape_button = tk.Button(self, text="Draw Random Shape", command=self.draw_random_shape)
+        self.draw_random_shape_button.grid(row=8, column=1, pady=5, padx=10, sticky=tk.W)
+
+
     def execute_code(self):
         code = self.code_editor.get("1.0", tk.END)
         self.output_display.config(state=tk.NORMAL)
@@ -136,6 +170,9 @@ class TranslateShapeTab(tk.Frame):
     def clear_drawing(self):
         # This method now correctly clears only the user's drawings, not the grid or axes
         self.turtle.drawing_turtle.clear()
+    
+    def draw_random_shape(self):
+        self.turtle.draw_random_shape()
 
 if __name__ == "__main__":
     app = TranslateShapeTab(None)
