@@ -91,31 +91,39 @@ class Turtle:
         self.grid_turtle.penup()  
     
     def draw_random_shape(self):
-        shape = random.choice(['square', 'triangle', 'rectangle'])  
-        x = random.randint(-200, 200)
-        y = random.randint(-200, 200)
+        shape = random.choice(['square', 'triangle', 'rectangle'])
+        grid_size = 50  # Grid spacing
+
+        # Adjust starting point to align with the grid
+        x = random.randint(-200, 200) // grid_size * grid_size
+        y = random.randint(-200, 200) // grid_size * grid_size
+
         self.drawing_turtle.penup()
         self.drawing_turtle.goto(x, y)
         self.drawing_turtle.pendown()
 
         if shape == 'square':
-            side = random.randint(20, 100)
+            # Ensure side length is a multiple of grid_size
+            side = random.randint(1, 4) * grid_size
             for _ in range(4):
                 self.drawing_turtle.forward(side)
                 self.drawing_turtle.right(90)
         elif shape == 'triangle':
-            side = random.randint(20, 100)
+            # Ensure base length is a multiple of grid_size
+            side = random.randint(1, 4) * grid_size
             for _ in range(3):
                 self.drawing_turtle.forward(side)
                 self.drawing_turtle.right(120)
         elif shape == 'rectangle':
-            length = random.randint(20, 150)  # Length of the rectangle
-            width = random.randint(20, 150)  # Width of the rectangle
+            # Ensure length and width are multiples of grid_size
+            length = random.randint(1, 6) * grid_size
+            width = random.randint(1, 3) * grid_size
             for _ in range(2):
                 self.drawing_turtle.forward(length)
                 self.drawing_turtle.right(90)
                 self.drawing_turtle.forward(width)
                 self.drawing_turtle.right(90)
+
 
 
 
