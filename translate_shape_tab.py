@@ -44,6 +44,13 @@ class Turtle:
                     self.turn_right(value)
             except ValueError:
                 return f"Invalid command: {line}"
+        elif command == "goto" and len(tokens) == 3:
+            try:
+                x = float(tokens[1])
+                y = float(tokens[2])
+                self.goto(x, y)
+            except ValueError:
+                return f"Invalid command: {line}"
         else:
             return f"Invalid command: {line}"
 
@@ -52,6 +59,11 @@ class Turtle:
 
     def turn_right(self, angle):
         self.drawing_turtle.right(angle)
+    
+    def goto(self, x, y):
+        self.drawing_turtle.penup() 
+        self.drawing_turtle.goto(x, y)
+        self.drawing_turtle.pendown()
 
     def draw_grid(self):
         self.grid_turtle.speed(0)  
