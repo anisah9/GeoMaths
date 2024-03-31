@@ -3,42 +3,21 @@ from tkinter import scrolledtext
 from tkinter import messagebox
 import turtle
 
+
 class Turtle:
     def __init__(self, canvas, output_display):
         self.canvas = canvas
         self.output_display = output_display
-        # Separate turtles for grid and user drawings
+
         self.grid_turtle = turtle.RawTurtle(canvas)
-        self.user_turtle = turtle.RawTurtle(canvas)
-        self.setup_turtles()
-        self.draw_grid()
-
-    def setup_turtles(self):
-        # Setup for grid turtle
-        self.grid_turtle.speed(0)
+        self.grid_turtle.speed(0) 
         self.grid_turtle.penup()
-        self.grid_turtle.pencolor('#e0e0e0')
-        self.grid_turtle.hideturtle()
+        self.grid_turtle.hideturtle()  
+        self.draw_grid() 
 
-        # Setup for user turtle
-        self.user_turtle.speed(1)
-        self.user_turtle.pencolor('black')
-        self.user_turtle.penup()
-        self.user_turtle.goto(0, 0)
-        self.user_turtle.pendown()
-
-    def draw_grid(self):
-        self.grid_turtle.speed(0)  # Draw grid fast
-        for x in range(-250, 251, 50):
-            self.grid_turtle.penup()
-            self.grid_turtle.goto(x, -250)
-            self.grid_turtle.pendown()
-            self.grid_turtle.goto(x, 250)
-        for y in range(-250, 251, 50):
-            self.grid_turtle.penup()
-            self.grid_turtle.goto(-250, y)
-            self.grid_turtle.pendown()
-            self.grid_turtle.goto(250, y)
+        self.drawing_turtle = turtle.RawTurtle(canvas)
+        self.drawing_turtle.speed(1) 
+        self.drawing_turtle.pencolor('black')
 
     def execute_code(self, code):
         lines = code.split('\n')
@@ -50,33 +29,77 @@ class Turtle:
 
     def execute_line(self, line):
         tokens = line.split()
+
         if not tokens:
             return None  # Ignore empty lines
 
-        try:
-            if tokens[0] == "forward" and len(tokens) == 2:
-                distance = float(tokens[1])
-                self.user_turtle.forward(distance)
-            elif tokens[0] == "right" and len(tokens) == 2:
-                angle = float(tokens[1])
-                self.user_turtle.right(angle)
-            else:
+        command = tokens[0]
+        if command in ["forward", "right"] and len(tokens) == 2:
+            try:
+                value = float(tokens[1])
+                if command == "forward":
+                    self.move_forward(value)
+                elif command == "right":
+                    self.turn_right(value)
+            except ValueError:
                 return f"Invalid command: {line}"
-        except ValueError:
+        else:
             return f"Invalid command: {line}"
 
-    def clear_user_drawings(self):
-        self.user_turtle.clear()
+    def move_forward(self, distance):
+        self.drawing_turtle.forward(distance)
+
+    def turn_right(self, angle):
+        self.drawing_turtle.right(angle)
+
+    def draw_grid(self):
+        self.grid_turtle.speed(0)  
+        self.grid_turtle.pencolor('#e0e0e0')  
+        self.grid_turtle.pensize(1)  
+
+        # Draw vertical grid lines
+        for x in range(-250, 251, 50):
+            self.grid_turtle.penup()
+            self.grid_turtle.goto(x, -250)
+            self.grid_turtle.pendown()
+            self.grid_turtle.goto(x, 250)
+
+        # Draw horizontal grid lines
+        for y in range(-250, 251, 50):
+            self.grid_turtle.penup()
+            self.grid_turtle.goto(-250, y)
+            self.grid_turtle.pendown()
+            self.grid_turtle.goto(250, y)
+
+        # Drawing axes with a different color and pen size
+        self.grid_turtle.pencolor('black')  # Black color for axes
+        self.grid_turtle.pensize(2)  # Thicker lines for the axes
+
+        # Draw x-axis
+        self.grid_turtle.penup()
+        self.grid_turtle.goto(-250, 0)
+        self.grid_turtle.pendown()
+        self.grid_turtle.goto(250, 0)
+
+        # Draw y-axis
+        self.grid_turtle.penup()
+        self.grid_turtle.goto(0, -250)
+        self.grid_turtle.pendown()
+        self.grid_turtle.goto(0, 250)
+
+        self.grid_turtle.penup()  
+
 
 class TranslateShapeTab(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master, bg="#ecf0f1")
         self.winfo_toplevel().title("Geometry Tool")
 
+        # Setup label, text editor, and buttons as before
         editor_info_label = tk.Label(self, text="Enter your drawing instructions below:", font=("Arial", 13), bg="#ecf0f1")
         editor_info_label.grid(row=1, column=1, pady=10, padx=10, sticky=tk.W)
 
-        self.clear_drawing_button = tk.Button(self, text="Clear Drawing", command=self.clear_user_drawings)
+        self.clear_drawing_button = tk.Button(self, text="Clear Drawing", command=self.clear_drawing)
         self.clear_drawing_button.grid(row=1, column=4, pady=5, padx=10, sticky=tk.W)
 
         self.code_editor = scrolledtext.ScrolledText(self, wrap=tk.WORD, width=50, height=15)
@@ -93,6 +116,9 @@ class TranslateShapeTab(tk.Frame):
 
         self.turtle = Turtle(self.turtle_canvas, self.output_display)
 
+        self.output_display.tag_config("error", foreground="red")
+        self.output_display.tag_config("success", foreground="green")
+
     def execute_code(self):
         code = self.code_editor.get("1.0", tk.END)
         self.output_display.config(state=tk.NORMAL)
@@ -107,16 +133,11 @@ class TranslateShapeTab(tk.Frame):
 
         self.output_display.config(state=tk.DISABLED)
 
-    def clear_user_drawings(self):
-        self.turtle.clear_user_drawings()
+    def clear_drawing(self):
+        # This method now correctly clears only the user's drawings, not the grid or axes
+        self.turtle.drawing_turtle.clear()
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = TranslateShapeTab(root)
-    app.pack(fill="both", expand=True)
-    root.geometry("800x600")
-    root.mainloop()
-
-
-
-
+    app = TranslateShapeTab(None)
+    app.geometry("800x600")
+    app.mainloop()
