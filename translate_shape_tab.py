@@ -21,16 +21,16 @@ class Turtle:
         self.drawing_turtle.speed(1) 
         self.drawing_turtle.pencolor('black')
 
-        # Add an attribute to store shape details
+
         self.shape_details = {}
-        self.reset_position_orientation()  # Reset position and orientation
+        self.reset_position_orientation()  
     
     def reset_position_orientation(self):
-        self.current_position = (0, 0)  # Assuming (0, 0) is the starting position
-        self.current_angle = 0  # Assuming 0 degrees is facing "east"
+        self.current_position = (0, 0)  
+        self.current_angle = 0  
 
     def update_position_based_on_command(self, distance):
-        # Example calculation for forward movement based on current orientation
+        
         radians = math.radians(self.current_angle)
         delta_x = distance * math.cos(radians)
         delta_y = distance * math.sin(radians)
@@ -39,34 +39,33 @@ class Turtle:
             self.current_position[1] + delta_y
         )
 
-    # def execute_code(self, code):
-    #     self.reset_position_orientation()  # Reset position and orientation at start
-    #     self.movement_history = []  # Track each forward movement distance
-    #     lines = code.split('\n')
-    #     for line in lines:
-    #         self.execute_line(line.strip())
-        
-    #     # Calculate dimensions from movement history
-    #     self.calculate_dimensions()
-
     def execute_code(self, code):
         self.reset_position_orientation()  # Reset position and orientation at start
         self.movement_history = []  # Track each forward movement distance
+        self.output_display.delete("1.0", tk.END)  # Clear previous messages
+
+        error_encountered = False
         lines = code.split('\n')
         for line in lines:
-            self.execute_line(line.strip())
+            valid_command, message = self.execute_line(line.strip())
+            if not valid_command:
+                self.output_display.config(state=tk.NORMAL)
+                self.output_display.insert(tk.END, message + "\n", "error")
+                error_encountered = True
+                break  # Stop executing further lines
         
-        # Update the actual final position after all commands have been executed
-        self.shape_details['actual_final_pos'] = self.current_position
-
-        # Continue with dimension calculation or any other operations needed
-        self.calculate_dimensions()
+        if not error_encountered:
+            # Update the actual final position after all commands have been executed
+            self.shape_details['actual_final_pos'] = self.current_position
+            
+            self.calculate_dimensions()
 
 
     def execute_line(self, line):
         tokens = line.split()
         if not tokens:
-            return
+            return True, ""  # Ignore empty lines without error
+
         command, *args = tokens
         if command == "forward" and len(args) == 1:
             self.move_forward(float(args[0]))
@@ -75,19 +74,20 @@ class Turtle:
         elif command == "goto" and len(args) == 2:
             self.goto(float(args[0]), float(args[1]))
         else:
-            self.output_display.insert(tk.END, f"Invalid command: {line}\n", "error")
+            return False, f"Invalid command: {line}"  # Return False to indicate error
+
+        return True, ""  # Return True for valid commands
     
     def calculate_dimensions(self):
-        if len(self.movement_history) == 4:  # Potential square or rectangle
-            # Simplified logic: assuming first two movements for length, next two for width
+        if len(self.movement_history) == 4: 
+
             length = self.movement_history[0]
             width = self.movement_history[1]
             if length == width:  # Square
                 self.shape_details['user_dimensions'] = (length,)
             else:  # Rectangle
                 self.shape_details['user_dimensions'] = (length, width)
-        elif len(self.movement_history) == 3:  # Potential triangle
-            # Assuming equilateral triangle for simplicity
+        elif len(self.movement_history) == 3: 
             side = self.movement_history[0]
             self.shape_details['user_dimensions'] = (side,)
 
@@ -151,49 +151,48 @@ class Turtle:
     def draw_random_shape(self):
         shape = random.choice(['square', 'triangle', 'rectangle'])
         grid_size = 50  # Grid spacing
+        
+        if shape in ['square', 'triangle']:
+            max_side = min(250, 250) // 2
+            side = random.randint(1, max_side // grid_size) * grid_size
+            if shape == 'square':
+                dimensions = (side,)
+            else:  # triangle
+                dimensions = (side,)
+        else:  # rectangle
+            max_length = min(250, 250) // 2
+            max_width = min(250, 250) // 4
+            length = random.randint(1, max_length // grid_size) * grid_size
+            width = random.randint(1, max_width // grid_size) * grid_size
+            dimensions = (length, width)
 
-        x = random.randint(-200, 200) // grid_size * grid_size
-        y = random.randint(-200, 200) // grid_size * grid_size
+        x = random.randint(-250 + max(dimensions), 250 - max(dimensions)) // grid_size * grid_size
+        y = random.randint(-250 + max(dimensions), 250 - max(dimensions)) // grid_size * grid_size
 
         self.drawing_turtle.penup()
         self.drawing_turtle.goto(x, y)
         self.drawing_turtle.pendown()
 
-        if shape == 'square':
-            side = random.randint(1, 4) * grid_size
-            for _ in range(4):
+        print(f"Starting to draw {shape} at position ({x}, {y})")
+
+        if shape == 'square' or shape == 'triangle':
+            for _ in range(4) if shape == 'square' else range(3):
                 self.drawing_turtle.forward(side)
-                self.drawing_turtle.right(90)
-            # Store square side length
-            dimensions = (side,)  # Tuple with a single value for square side length
-        elif shape == 'triangle':
-            side = random.randint(1, 4) * grid_size
-            for _ in range(3):
-                self.drawing_turtle.forward(side)
-                self.drawing_turtle.right(120)
-            # Store triangle side length
-            dimensions = (side,)  # Tuple with a single value for triangle side length
-        elif shape == 'rectangle':
-            length = random.randint(1, 6) * grid_size
-            width = random.randint(1, 3) * grid_size
+                self.drawing_turtle.right(90 if shape == 'square' else 120)
+        else:  # rectangle
             for _ in range(2):
                 self.drawing_turtle.forward(length)
                 self.drawing_turtle.right(90)
                 self.drawing_turtle.forward(width)
                 self.drawing_turtle.right(90)
-            # Store rectangle length and width
-            dimensions = (length, width)  # Tuple with two values for rectangle dimensions
-        
-        # Update shape details with shape type, starting position, and dimensions
+
         self.shape_details = {
             'shape': shape,
             'start_pos': (x, y),
             'dimensions': dimensions
         }
 
-
-
-
+        print(f"Drew a {shape} with dimensions {dimensions} starting at position ({x}, {y})")
 
 
 class TranslateShapeTab(tk.Frame):
@@ -240,7 +239,7 @@ class TranslateShapeTab(tk.Frame):
     def check_final_position(self):
         actual_final_pos = self.turtle.shape_details.get('actual_final_pos')
         expected_final_pos = self.turtle.shape_details.get('expected_final_pos')
-        tolerance = 10  # Adjust tolerance as needed for your application
+        tolerance = 10  
 
         if actual_final_pos and expected_final_pos:
             distance = math.sqrt((actual_final_pos[0] - expected_final_pos[0]) ** 2 + (actual_final_pos[1] - expected_final_pos[1]) ** 2)
@@ -254,20 +253,28 @@ class TranslateShapeTab(tk.Frame):
             self.output_display.config(state=tk.NORMAL)
             self.output_display.insert(tk.END, "Position check failed: Position data is missing.\n", "error")
         
-        # After checking the position, now check the dimensions
+    
         self.check_shape_dimensions()
         self.output_display.config(state=tk.DISABLED)
-    
+
     def check_shape_dimensions(self):
         user_dimensions = self.turtle.shape_details.get('user_dimensions', ())
         expected_dimensions = self.turtle.shape_details.get('dimensions', ())
         if user_dimensions == expected_dimensions:
             self.output_display.config(state=tk.NORMAL)
             self.output_display.insert(tk.END, "Dimension check passed: Shape dimensions are correct.\n", "success")
+            self.ask_for_new_question()  # Add this line
         else:
             self.output_display.config(state=tk.NORMAL)
             self.output_display.insert(tk.END, "Dimension check failed: Shape dimensions are not correct.\n", "error")
         self.output_display.config(state=tk.DISABLED)
+    
+    def ask_for_new_question(self):
+        answer = messagebox.askyesno("Question Correct", "Would you like another question?")
+        if answer:
+            self.clear_drawing()
+            self.draw_random_shape_and_question()
+
 
 
     def clear_drawing(self):
@@ -301,7 +308,6 @@ class TranslateShapeTab(tk.Frame):
         self.question_label.config(text=question)
     
     def is_correct_position(self, final_pos, expected_pos, tolerance=10):
-        # Simple distance calculation to allow for some margin of error
         dist = math.sqrt((final_pos[0] - expected_pos[0])**2 + (final_pos[1] - expected_pos[1])**2)
         return dist <= tolerance
     
