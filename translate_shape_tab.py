@@ -147,6 +147,23 @@ class Turtle:
         self.grid_turtle.goto(0, 250)
 
         self.grid_turtle.penup()  
+
+                # Numbering the x-axis
+        for x in range(-250, 251, 50):
+            self.grid_turtle.penup()
+            self.grid_turtle.goto(x, -10)  
+            self.grid_turtle.pendown()
+            if x != 0:  
+                self.grid_turtle.write(str(x), align="center", font=("Arial", 8, "normal"))
+
+        # Numbering the y-axis
+        for y in range(-250, 251, 50):
+            self.grid_turtle.penup()
+            self.grid_turtle.goto(-20, y)  
+            self.grid_turtle.pendown()
+            if y != 0:  
+                self.grid_turtle.write(str(y), align="right", font=("Arial", 8, "normal"))
+
     
     def draw_random_shape(self):
         shape = random.choice(['square', 'triangle', 'rectangle'])
