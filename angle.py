@@ -160,7 +160,7 @@
 import tkinter as tk
 from tkinter import ttk
 from home_angle_tab import HomeTab
-from finding_unknown_angles import FindingUnknownAngles
+from angles_guide import AnglesGuide
 
 
 
@@ -172,11 +172,11 @@ class AngleTool(tk.Frame):
 
         # Initialize and add tabs
         self.home_angle_tab = HomeTab(self.tab_control)
-        self.finding_unknown_angles = FindingUnknownAngles(self.tab_control)
+        self.angles_guide = AnglesGuide(self.tab_control)
 
 
         self.tab_control.add(self.home_angle_tab, text='Home')
-        self.tab_control.add(self.finding_unknown_angles, text='Finding Unknown Angles')
+        self.tab_control.add(self.angles_guide, text='Angles Guide')
 
         
 
