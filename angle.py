@@ -161,6 +161,7 @@ import tkinter as tk
 from tkinter import ttk
 from home_angle_tab import HomeTab
 from angles_guide import AnglesGuide
+from angles_excercises import AngleExcercises
 
 
 
@@ -173,10 +174,12 @@ class AngleTool(tk.Frame):
         # Initialize and add tabs
         self.home_angle_tab = HomeTab(self.tab_control)
         self.angles_guide = AnglesGuide(self.tab_control)
+        self.angles_excercises = AngleExcercises(self.tab_control)
 
 
         self.tab_control.add(self.home_angle_tab, text='Home')
         self.tab_control.add(self.angles_guide, text='Angles Guide')
+        self.tab_control.add(self.angles_excercises, text= 'Angles Excercises')
 
         
 
