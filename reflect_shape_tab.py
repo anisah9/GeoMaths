@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import scrolledtext
-from tkinter import messagebox
+from tkinter.font import Font
 import turtle
 import random
 
@@ -43,7 +43,6 @@ class Turtle:
             self.output_display.insert(tk.END, feedback + "\n", "feedback")
             self.output_display.config(state=tk.DISABLED)
         else:
-            # If no reflection was expected/attempted, just confirm successful execution
             self.output_display.config(state=tk.NORMAL)
             self.output_display.insert(tk.END, "Code executed successfully.\nVertices: " + str(self.vertices) + "\n", "success")
             self.output_display.config(state=tk.DISABLED)
@@ -53,7 +52,7 @@ class Turtle:
         tokens = line.split()
 
         if not tokens:
-            return None  # Ignore empty lines
+            return None  
 
         if tokens[0] == "forward" and len(tokens) == 2:
             try:
@@ -118,9 +117,8 @@ class Turtle:
             self.grid_turtle.pendown()
             self.grid_turtle.goto(250, y)
 
-        # Drawing axes with a different color and pen size
-        self.grid_turtle.pencolor('black')  # Black color for axes
-        self.grid_turtle.pensize(2)  # Thicker lines for the axes
+        self.grid_turtle.pencolor('black')  
+        self.grid_turtle.pensize(2)  
 
         # Draw x-axis
         self.grid_turtle.penup()
@@ -128,7 +126,6 @@ class Turtle:
         self.grid_turtle.pendown()
         self.grid_turtle.goto(250, 0)
 
-        # Draw y-axis
         self.grid_turtle.penup()
         self.grid_turtle.goto(0, -250)
         self.grid_turtle.pendown()
@@ -136,7 +133,6 @@ class Turtle:
 
         self.grid_turtle.penup()  
 
-                # Numbering the x-axis
         for x in range(-250, 251, 50):
             self.grid_turtle.penup()
             self.grid_turtle.goto(x, -10)  
@@ -144,7 +140,6 @@ class Turtle:
             if x != 0:  
                 self.grid_turtle.write(str(x), align="center", font=("Arial", 8, "normal"))
 
-        # Numbering the y-axis
         for y in range(-250, 251, 50):
             self.grid_turtle.penup()
             self.grid_turtle.goto(-20, y)  
@@ -208,49 +203,116 @@ class ReflectShapeTab(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master, bg="#ecf0f1")
 
-        # Setup label, text editor, and buttons 
-        editor_info_label = tk.Label(self, text="Enter your drawing instructions below:", font=("Arial", 13), bg="#ecf0f1")
-        editor_info_label.grid(row=1, column=1, pady=10, padx=10, sticky=tk.W)
+        # Left Panel
+        left_panel = tk.Frame(self, bg="white", width=350)
+        left_panel.grid(row=0, column=0, rowspan=10, padx=5, pady=5, sticky="nsew")
 
-        self.clear_drawing_button = tk.Button(self, text="Clear Drawing", command=self.clear_drawing)
-        self.clear_drawing_button.grid(row=1, column=4, pady=5, padx=10, sticky=tk.W)
+        text_widget = tk.Text(left_panel, height=15, width=50, wrap=tk.WORD)
+        text_widget.grid(row=0, column=0, padx=10, pady=10)
+
+        title_font = Font(family="Arial", size=16, weight="bold")
+        text_font = Font(family="Arial", size=14)
+
+        text_widget.insert(tk.END, "Welcome to the Reflect Shape Tab\n", "title")
+        text_widget.insert(tk.END, "\n")  
+        text_widget.insert(tk.END, "Welcome to the Reflect Shape Tab! Dive into an interactive space designed to enhance your understanding of shape reflection through coding. Embark on a hands-on journey where you can manipulate shapes across the canvas using coding commands. Delight in exploring how coding can transform geometric configurations and deepen your comprehension of coordinate systems. To begin, click the 'Draw Random Shape' button and follow the instructions provided below.", "text")
+
+        text_widget.tag_configure("title", font=title_font)
+        text_widget.tag_configure("text", font=text_font)
+
+        text_widget.configure(state='disabled') 
+
+        editor_info_label = tk.Label(left_panel, text="Enter your drawing instructions below:", font=("Arial", 13), bg="#ecf0f1")
+        editor_info_label.grid(row=1, column=0, pady=5, padx=10, sticky=tk.W)
 
         self.code_editor = scrolledtext.ScrolledText(self, wrap=tk.WORD, width=50, height=15)
-        self.code_editor.grid(row=1, column=1, rowspan=5, pady=10, padx=10, sticky=tk.W)
+        self.code_editor.grid(row=3, column=0, rowspan=5, pady=10, padx=10, sticky=tk.W)
 
         self.execute_button = tk.Button(self, text="Run Code", command=self.execute_code)
-        self.execute_button.grid(row=6, column=1, pady=5, padx=10, sticky=tk.W)
+        self.execute_button.grid(row=7, column=0, pady=5, padx=10, sticky=tk.W)
 
         self.output_display = tk.Text(self, wrap=tk.WORD, state=tk.DISABLED, width=50, height=10)
-        self.output_display.grid(row=7, column=1, pady=10, padx=10, sticky=tk.W)
-
-        self.turtle_canvas = tk.Canvas(self, width=500, height=500, bg="white")
-        self.turtle_canvas.grid(row=1, column=3, rowspan=7, pady=10, padx=10, sticky=tk.W)
-
-        self.turtle = Turtle(self.turtle_canvas, self.output_display)
+        self.output_display.grid(row=8, column=0, pady=10, padx=10, sticky=tk.W)
 
         self.output_display.tag_config("error", foreground="red")
         self.output_display.tag_config("success", foreground="green")
 
-        # Modified to include drawing and question generation
-        self.draw_random_shape_button = tk.Button(self, text="Draw Random Shape", command=self.draw_random_shape_and_question)
-        self.draw_random_shape_button.grid(row=8, column=1, pady=5, padx=10, sticky=tk.W)
+        self.turtle_canvas = tk.Canvas(self, width=570, height=570, bg="white")
+        self.turtle_canvas.grid(row=1, column=3, rowspan=7, pady=10, padx=10, sticky=tk.W)
 
-        # Label to display the reflection question
-        self.question_label = tk.Label(self, text="", font=("Arial", 13), bg="#ecf0f1")
-        self.question_label.grid(row=9, column=1, pady=10, padx=10, sticky=tk.W)
+        self.turtle = Turtle(self.turtle_canvas, self.output_display)
+
+        # Right Panel
+        right_panel = tk.Frame(self, bg="white", width=350)
+        right_panel.grid(row=0, column=4, rowspan=10, padx=5, pady=5, sticky="nsew")
+
+        info_box = tk.Text(right_panel, height= 23, width =40, wrap=tk.WORD, font=("Arial", 14))
+        info_box.grid(row=0, column=0, padx=10, pady=10)
+
+        title_font = Font(family="Arial", size=16, weight="bold")
+
+        info_box.insert(tk.END, "Reflection\n", "bold")
+
+        info_box.insert(tk.END, "\n")
+
+        reflection_text = (
+            "Reflection, in geometry, is like flipping an image over a line so that the original and its "
+            "image are exact opposites, yet they are the same distance from the line. It's like having a "
+            "sticker on one side of a page and seeing its mirror image on the other side after flipping "
+            "it over the spine of a book.\n\n"
+            "The line that you flip the shape over is called the line of reflection. It acts as the mirror. "
+            "When you perform a reflection, each point of the original shape appears directly opposite on the "
+            "other side of the line.\n\n"
+            "For example, if you have a point or a part of a shape that is 2 squares away from the line of "
+            "reflection to the left, its reflected image will be 2 squares away to the right. It’s as if every "
+            "point jumps straight across to the other side of the 'mirror' line, the same distance away, but directly opposite."
+        )
+        info_box.insert(tk.END, reflection_text)
+
+        info_box.tag_configure("bold", font=title_font)
+
+        info_box.configure(state="disabled")
+
+        self.draw_random_shape_button = tk.Button(right_panel, text="Draw Reflection Question", command=self.draw_random_shape_and_question)
+        self.draw_random_shape_button.grid(row=1, column=0, pady=2, padx=10, sticky=tk.W)
+
+        self.question_label = tk.Label(right_panel, text="", font=("Arial", 13), bg="#ecf0f1")
+        self.question_label.grid(row=2, column=0, pady=2, padx=10, sticky=tk.W)
+
+        instructions_text = (
+            "Reflection Instructions:\n"
+            "1. Observe the randomly drawn shape on the canvas.\n"
+            "2. Use the provided tools to reflect the shape across the indicated line of reflection.\n"
+            "3. Input the necessary commands in the command editor to draw the reflected shape.\n"
+            "4. Press the 'Run Code' button to execute your commands and display the reflection on the canvas.\n"
+            "5. Once executed, the correct reflection will be shown on the canvas. Compare it to your drawn shape to see if it's accurate. If it's not, modify your commands in the code editor to get the correct reflection.\n"
+            "6. Ensure that the reflected shape maintains the same orientation and size as the original.\n"
+            "Good luck with your reflection exercise!"
+        )
+
+        instructions_box = tk.Text(right_panel, height=10, width=35, wrap=tk.WORD, font=("Arial", 14))
+        instructions_box.grid(row=3, column=0, padx=10, pady=10)  # Make sure row is set to the next available position
+        instructions_box.insert(tk.END, instructions_text)
+        instructions_box.configure(state="disabled", bg="#ecf0f1")
+
+        self.clear_drawing_button = tk.Button(self, text="Clear Drawing", command=self.clear_drawing)
+        self.clear_drawing_button.grid(row=8, column=3, pady=5, padx=10, sticky=tk.W)
+
+        self.check_reflection_button = tk.Button(self, text="Check Reflection", command=self.check_reflection)
+        self.check_reflection_button.grid(row=8, column=3, pady=5, padx=10, sticky=tk.W)
+        self.check_reflection_button.grid_remove()
 
 
     def execute_code(self):
         code = self.code_editor.get("1.0", tk.END)
         self.turtle.execute_code(code)
+        self.check_reflection_button.grid()  
 
-        # Draw the expected reflection for visual comparison
-        self.turtle.draw_expected_reflection(self.expected_vertices)
 
+    def check_reflection(self):
         actual_simplified = self.turtle.simplify_vertices(self.turtle.vertices)
         expected_simplified = self.turtle.simplify_vertices(self.expected_vertices)
-
+        self.turtle.draw_expected_reflection(self.expected_vertices) 
         if self.turtle.compare_shapes(expected_simplified, actual_simplified):
             feedback = "Congratulations! The reflection was performed correctly."
         else:
@@ -258,7 +320,7 @@ class ReflectShapeTab(tk.Frame):
         self.output_display.config(state=tk.NORMAL)
         self.output_display.insert(tk.END, feedback + "\n", "feedback")
         self.output_display.config(state=tk.DISABLED)
-
+        self.draw_random_shape_button.grid()
     
     def clear_drawing(self):
         self.turtle.turtle.clear()
@@ -268,51 +330,51 @@ class ReflectShapeTab(tk.Frame):
         self.turtle.turtle.setheading(0)
         self.turtle.turtle.pendown()
         self.turtle.draw_grid()
-    
+
+
     def draw_random_shape(self):
-        shapes = ['square', 'rectangle', 'triangle']
-        # Choose a random shape
+        shapes = ['square', 'rectangle']  
         shape = random.choice(shapes)
 
-        grid_positions = range(-250, 251, 50)  
-        start_x = random.choice(grid_positions)
-        start_y = random.choice(grid_positions)
-
-        self.turtle.turtle.clear() 
-        self.turtle.goto(start_x, start_y) 
+        grid_spacing = 50 
+        grid_limit = 250  
 
         if shape == 'square':
-            side_length = 50  
+            max_offset = 50 
+        elif shape == 'rectangle':
+            max_offset = 100 
+
+        start_x = random.randint((-grid_limit + max_offset) // grid_spacing, (grid_limit - max_offset) // grid_spacing) * grid_spacing
+        start_y = random.randint((-grid_limit + max_offset) // grid_spacing, (grid_limit - max_offset) // grid_spacing) * grid_spacing
+
+        self.turtle.turtle.clear()
+        self.turtle.goto(start_x, start_y)
+
+        if shape == 'square':
+            side_length = 50
             for _ in range(4):
                 self.turtle.move_forward(side_length)
                 self.turtle.turn_right(90)
         elif shape == 'rectangle':
-            length = 100  
-            width = 50 
+            length = 100
+            width = 50
             for _ in range(2):
-                self.turtle.move_forward(length)  
+                self.turtle.move_forward(length)
                 self.turtle.turn_right(90)
-                self.turtle.move_forward(width) 
+                self.turtle.move_forward(width)
                 self.turtle.turn_right(90)
-        elif shape == 'triangle':
-            side_length = 50  
-            for _ in range(3):
-                self.turtle.move_forward(side_length)
-                self.turtle.turn_right(120)
 
-        # self.turtle.turtle.penup()
-        # self.turtle.turtle.goto(0, 0)
-        # self.turtle.turtle.setheading(0)
         self.turtle.turtle.pendown()
-    
+
     def draw_random_shape_and_question(self):
         self.draw_random_shape()
         questions = ["Reflect the shape in the x-axis.", "Reflect the shape in the y-axis."]
         selected_question = random.choice(questions)
         self.question_label.config(text=selected_question)
-
         reflection_axis = 'x' if "x-axis" in selected_question else 'y'
         self.expected_vertices = self.turtle.calculate_reflected_vertices(reflection_axis)
+        self.draw_random_shape_button.grid_remove()
+
     
 if __name__ == "__main__":
     app = ReflectShapeTab(None)
