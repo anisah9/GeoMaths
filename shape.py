@@ -1,4 +1,3 @@
-# coordinate.py
 import tkinter as tk
 from tkinter import ttk
 from home_shape_tab import HomeShapeTab
@@ -10,8 +9,7 @@ class ShapeTool(tk.Frame):
         super().__init__(master, bg="#ecf0f1")
         self.tab_control = ttk.Notebook(self)
 
-        # Initialize and add tabs
-        self.home_shape_tab = HomeShapeTab(self.tab_control)
+        self.home_shape_tab = HomeShapeTab(self.tab_control, self.tab_control)
         self.shape_guide = ShapeGuide(self.tab_control)
         self.draw_shape_tab = DrawShapeTab(self.tab_control)
     
