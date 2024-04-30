@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
-import Pmw
 from shape import ShapeTool
 from angle import AngleTool
 from coordinate import CoordinateTool
@@ -46,7 +45,6 @@ class MainApp(tk.Tk):
         tk.Tk.__init__(self)
         tk.Tk.wm_title(self, "GeoMaths")
         self.configure(bg="#ecf0f1") 
-        Pmw.initialise(self)
 
         self.notebook = ttk.Notebook(self)
         self.welcome_page = WelcomePage(self.notebook, self)

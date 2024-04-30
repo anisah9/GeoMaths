@@ -11,6 +11,7 @@ class Turtle:
         self.output_display = output_display
         self.turtle = turtle.RawTurtle(canvas)
         self.turtle.speed(1)
+        self.pen_color = 'black'
         self.vertices = []  # To store shape vertices
 
         self.grid_turtle = turtle.RawTurtle(canvas)
@@ -22,6 +23,8 @@ class Turtle:
         self.vertices = []  # To store shape vertices
 
     def execute_code(self, code):
+        self.turtle.pencolor('green') 
+        self.turtle.pensize(3)
         self.vertices.clear() 
 
         lines = code.split('\n')
@@ -296,7 +299,7 @@ class ReflectShapeTab(tk.Frame):
         instructions_box.configure(state="disabled", bg="#ecf0f1")
 
         self.clear_drawing_button = tk.Button(self, text="Clear Drawing", command=self.clear_drawing)
-        self.clear_drawing_button.grid(row=8, column=3, pady=5, padx=10, sticky=tk.W)
+        self.clear_drawing_button.grid(row=8, column=4, pady=5, padx=10, sticky=tk.W)
 
         self.check_reflection_button = tk.Button(self, text="Check Reflection", command=self.check_reflection)
         self.check_reflection_button.grid(row=8, column=3, pady=5, padx=10, sticky=tk.W)
@@ -333,6 +336,8 @@ class ReflectShapeTab(tk.Frame):
 
 
     def draw_random_shape(self):
+        self.turtle.turtle.pencolor('orange')
+        self.turtle.turtle.width(3) 
         shapes = ['square', 'rectangle']  
         shape = random.choice(shapes)
 
