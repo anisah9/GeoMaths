@@ -298,10 +298,11 @@ class DrawShapeTab(tk.Frame):
         self.turtle.turtle.pencolor('orange')  # Setting color for circle
         self.turtle.turtle.pensize(3)  # Setting line thickness for circle
         radius = 50
-        self.turtle.penup()
-        self.turtle.goto(-radius, 0)
-        self.turtle.pendown()
-        self.turtle.circle(radius)
+        self.turtle.turtle.penup()  # Use penup method on the turtle attribute
+        self.turtle.turtle.goto(-radius, 0)  # Use goto method on the turtle attribute
+        self.turtle.turtle.pendown()  # Use pendown method on the turtle attribute
+        self.turtle.turtle.circle(radius)  # Use circle method on the turtle attribute
+
 
     def draw_rectangle(self):
         self.turtle.turtle.reset()
