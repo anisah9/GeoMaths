@@ -1,12 +1,12 @@
 # GeoMaths
 
-GeoMaths is an interactive educational tool designed to help Year 6 students learn and understand geometry through coding activities and visual demonstrations. This tool supports the drawing and manipulation of 2D shapes and allows for the real-time visualization of geometric transformations.
+GeoMaths is an interactive educational tool designed to help Year 6 students learn and understand geometry through coding activities and visual demonstrations. This tool supports the drawing and manipulation of 2D shapes and allows for the real-time visualisation of geometric transformations.
 
 ## Features
 
 - **Shape Manipulation**: Draw and manipulate basic and complex 2D shapes including squares, circles, rectangles, triangles, and polygons.
 - **Advanced Geometry Concepts**: Learn transformations such as translations and reflections.
-- **Real-Time Visualization**: Execute Python code to visualize geometric concepts dynamically on a canvas.
+- **Real-Time Visualisation**: Execute Python code to visualise geometric concepts dynamically on a canvas.
 - **Coding Activities**: Create custom shapes and patterns through a user-friendly coding interface.
 - **User Interface**: Intuitive and accessible interface with age-appropriate interactive elements, including a code editor and visual output canvas.
 - **Saving and Exporting**: Save your work and export drawings as images in various formats like PNG and JPEG.
