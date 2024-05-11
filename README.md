@@ -45,6 +45,67 @@ Follow these detailed steps to set up and run the GeoMaths application:
   cd GeoMaths
   ```
 
+### Install Dependencies
+
+For macOS:
+
+1. Open the Terminal.
+2. Navigate to your project directory.
+
+```bash
+cd path/to/GeoMaths
+```
+
+3. Create the virtual enviroment:
+
+```bash
+python3 -m venv myenv
+```
+
+4. Activate the virtual environment:
+
+```bash
+source myenv/bin/activate
+```
+
+5. To deactivate:
+
+```bash
+deactivate
+```
+
+For Windows:
+
+1. Open the Terminal.
+2. Navigate to your project directory.
+
+```bash
+cd path/to/GeoMaths
+```
+
+3. Create the virtual enviroment:
+
+```bash
+py -m venv myenv
+```
+
+4. Activate the virtual environment:
+
+- Command Prompt:
+  ```bash
+  source myenv/bin/activate
+  ```
+- PowerShell:
+  ```bash
+  myenv\Scripts\Activate.ps1
+  ```
+
+5. To deactivate:
+
+```bash
+deactivate
+```
+
 ### Run the Application
 
 - Execute the main script using Python:
